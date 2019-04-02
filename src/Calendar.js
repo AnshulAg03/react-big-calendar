@@ -983,9 +983,27 @@ class Calendar extends React.Component {
       onDrillDown(date, view, this.drilldownView)
       return
     }
-    if (view) this.handleViewChange(view)
 
-    this.handleNavigate(navigate.DATE, date)
+    if (view) {
+      if (view !== this.props.view && isValidView(view, this.props)) {
+        this.props.onView(view)
+      }
+
+      let views = this.getViews()
+      let ViewComponent = views[view]
+      const action = navigate.DATE
+      const { getNow, onNavigate, ...props } = this.props
+
+      const newDate = moveDate(ViewComponent, {
+        ...props,
+        action,
+        date,
+        today: getNow(),
+      })
+
+      onNavigate(newDate, view, action)
+      this.handleRangeChange(newDate, ViewComponent, view)
+    }
   }
 }
 
